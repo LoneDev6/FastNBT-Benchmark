@@ -1,10 +1,8 @@
 package dev.lone.fastnbt_benchmark.tests;
 
 import dev.lone.LoneLibs.nbt.nbtapi.*;
-import dev.lone.fastnbt.nms.nbt.NCompound;
-import dev.lone.fastnbt.nms.nbt.NItem;
-import dev.lone.fastnbt.nms.nbt.NTagList;
-import dev.lone.fastnbt.nms.nbt.NbtType;
+import dev.lone.fastnbt.nms.nbt.*;
+import dev.lone.fastnbt.nms.nbt.NBTType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -12,39 +10,44 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class Test
 {
+    private static boolean BENCHMARK = true;
+
     public static void run()
     {
-        try
-        {
-            Benchmark b = new Benchmark();
-            b.init();
-            for (int i = 0; i < 5_000; i++)
-            {
-                fastNbtTest();
-            }
-            b.elapsed();
-            System.out.println("FastNbt: " + b.elapsed());
+        fastNbtTest0();
 
-            b = new Benchmark();
-            b.init();
-            for (int i = 0; i < 5_000; i++)
-            {
-                nbtApiTest();
-            }
-            System.out.println("NBT API: " + b.elapsed());
-        }
-        catch (RuntimeException ex)
+        if(BENCHMARK)
         {
-            Bukkit.getLogger().severe("Failed NBT tests!");
-            ex.printStackTrace();
+            try
+            {
+                Benchmark b = new Benchmark();
+                b.init();
+                for (int i = 0; i < 5_000; i++)
+                {
+                    fastNbtTest();
+                }
+                b.elapsed();
+                System.out.println("FastNbt: " + b.elapsed());
+
+                b = new Benchmark();
+                b.init();
+                for (int i = 0; i < 5_000; i++)
+                {
+                    nbtApiTest();
+                }
+                System.out.println("NBT API: " + b.elapsed());
+            }
+            catch (RuntimeException ex)
+            {
+                Bukkit.getLogger().severe("Failed NBT tests!");
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -57,15 +60,15 @@ public class Test
         nItem.setString("str", "sus");
         nItem.setIntegerList("intlist", List.of(1,2,3,4,5,6,7,8,9,0));
         nItem.setLongList("longlist", List.of(1L,2L,3L));
-        NTagList<?> compoundList = nItem.getOrAddList("compound_list", NbtType.Compound);
+        NList compoundList = nItem.getOrAddList("compound_list", NBTType.Compound);
         {
-            NCompound<?> entry = new NCompound<>();
+            NCompound entry = new NCompound();
             entry.setInt("prop1", 1337);
-            compoundList.add(entry);
+            compoundList.addCompound(entry);
         }
 
-        nItem.setDisplayName("{\"text\":\"Tunic of Destiny\",\"color\":\"blue\"}");
-        nItem.setLore(List.of("{\"text\":\"Tunic of Destiny\",\"color\":\"blue\"}", "{\"text\":\"Tunic of Destiny\",\"color\":\"red\"}"));
+        nItem.setDisplayNameCompound("{\"text\":\"Tunic of Destiny\",\"color\":\"blue\"}");
+        nItem.setLoreCompounds(List.of("{\"text\":\"Tunic of Destiny\",\"color\":\"blue\"}", "{\"text\":\"Tunic of Destiny\",\"color\":\"red\"}"));
 
         nItem.setAttributeModifier(
                 "minecraft:generic.movement_speed",
@@ -135,9 +138,96 @@ public class Test
         NCompound compound = new NCompound();
         compound.setBoolean("test_put_tag", true);
 
-        nItem.putTag("this_is_a_put_tag", compound.getInternal());
+        nItem.putInternalTag("this_is_a_put_tag", compound.getInternal());
         nItem.save();
 
+
+        NList myNewList = nItem.addList("my_new_list", NBTType.String);
+
+        NList listString = new NList();
+        listString.addString("a");
+        listString.addString("b");
+        listString.addString("c");
+        listString.addString("d");
+
+        if(!"a".equals(listString.getString(0)))
+            throw new RuntimeException("Failed");
+        if(!"b".equals(listString.getString(1)))
+            throw new RuntimeException("Failed");
+        if(!"c".equals(listString.getString(2)))
+            throw new RuntimeException("Failed");
+        if(!"d".equals(listString.getString(3)))
+            throw new RuntimeException("Failed");
+
+        listString.setString(2, "o");
+
+        if(!"o".equals(listString.getString(2)))
+            throw new RuntimeException("Failed");
+
+        listString.addString("bro");
+
+        if(!"bro".equals(listString.getString(4)))
+            throw new RuntimeException("Failed");
+
+        nItem.setList("buiu", listString);
+
+
+        NList listString2 = nItem.addList("list_test_added", NBTType.Compound);
+        listString2.addCompound();
+        listString2.addCompound().setString("pppp", "qqqq");
+        listString2.addCompound();
+        listString2.addCompound().setString("yo", "wow");
+
+        {
+            NList test = nItem.getList("list_test_added", NBTType.Compound);
+            try
+            {
+                if (!test.getCompound(1).getString("pppp").equals("qqqq"))
+                {
+                    throw new RuntimeException("Failed");
+                }
+            }
+            catch (Throwable ex)
+            {
+                throw new RuntimeException("Failed", ex);
+            }
+        }
+
+        {
+            NList list = new NList();
+            list.addInt(1);
+            list.addInt(2);
+            list.addInt(3);
+            list.addInt(4);
+            list.addInt(5);
+
+            nItem.setList("nlist_list", list);
+        }
+
+        NList nList = new NList();
+        nList.addString("wow");
+        nList.addString("wow1");
+        nList.addString("wow2");
+        nList.addString("wow3");
+        nList.addString("wow4");
+        nList.addString("wow5");
+        nList.addString("wow6");
+
+        Iterator<String> iterator = nList.stringIterator();
+        while(iterator.hasNext())
+        {
+            String next = iterator.next();
+            System.out.println(next);
+        }
+
+
+        NList itemsLIst = NList.ofItemStackList(List.of(new ItemStack(Material.STONE), new ItemStack(Material.PAPER)));
+        @NotNull Iterator<ItemStack> itemsIterator = itemsLIst.itemIterator();
+        while(itemsIterator.hasNext())
+        {
+            ItemStack next = itemsIterator.next();
+            System.out.println(next.getType());
+        }
 
         Optional<? extends Player> player = Bukkit.getOnlinePlayers().stream().findFirst();
         if(player.isPresent())
@@ -161,15 +251,15 @@ public class Test
         nItem.setString("str", "sus");
         nItem.setIntegerList("intlist", List.of(1,2,3,4,5,6,7,8,9,0));
         nItem.setLongList("longlist", List.of(1L,2L,3L));
-        NTagList<?> compoundList = nItem.getOrAddList("compound_list", NbtType.Compound);
+        NList compoundList = nItem.getOrAddList("compound_list", NBTType.Compound);
         {
-            NCompound<?> entry = new NCompound<>();
+            NCompound entry = new NCompound();
             entry.setInt("prop1", 1337);
-            compoundList.add(entry);
+            compoundList.addCompound(entry);
         }
 
-        nItem.setDisplayName("{\"text\":\"Tunic of Destiny\",\"color\":\"blue\"}");
-        nItem.setLore(List.of("{\"text\":\"Tunic of Destiny\",\"color\":\"blue\"}", "{\"text\":\"Tunic of Destiny\",\"color\":\"red\"}"));
+        nItem.setDisplayNameCompound("{\"text\":\"Tunic of Destiny\",\"color\":\"blue\"}");
+        nItem.setLoreCompounds(List.of("{\"text\":\"Tunic of Destiny\",\"color\":\"blue\"}", "{\"text\":\"Tunic of Destiny\",\"color\":\"red\"}"));
 
         nItem.setEnchantment("minecraft:sharpness", (short) 10);
         nItem.removeEnchantment("minecraft:sharpness");
@@ -183,7 +273,7 @@ public class Test
         NCompound compound = new NCompound();
         compound.setBoolean("test_put_tag", true);
 
-        nItem.putTag("this_is_a_put_tag", compound.getInternal());
+        nItem.putInternalTag("this_is_a_put_tag", compound.getInternal());
         nItem.save();
     }
 

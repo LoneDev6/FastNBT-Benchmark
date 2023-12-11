@@ -60,37 +60,13 @@
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>matteodev</id>
+            <url>https://www.matteodev.it/spigot/public/maven/</url>
+        </repository>
     </repositories>
 
     <build>
-        <!--        <directory>R:\MavenBuildTarget\NmsTests\${project.artifactId}\target\</directory>-->
-        <directory>${project.basedir}/../.cache/targets/${project.artifactId}/target/</directory>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.extensions</groupId>
-                <artifactId>maven-build-cache-extension</artifactId>
-                <version>1.0.1-SNAPSHOT-unofficial-1.0.0</version>
-            </extension>
-            <extension>
-                <groupId>co.leantechniques</groupId>
-                <artifactId>maven-buildtime-extension</artifactId>
-                <version>2.0.3</version>
-            </extension>
-        </extensions>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.12.4</version>
-                    <configuration>
-                        <skipTests>true</skipTests>
-                        <skip>true</skip>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <!-- Disable useless maven plugins -->
         <!-- https://developer.jboss.org/people/ozizka/blog/2013/07/06/how-to-speed-up-maven-builds-disabling-unused-plugins -->
         <plugins>
@@ -114,29 +90,61 @@
                     <execution> <id>default-testResources</id> <phase>none</phase> </execution>
                 </executions>
             </plugin>
+
+            <!-- Shading -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>junit:junit</exclude>
+                                    <exclude>*:xml-apis</exclude>
+                                    <exclude>org.apache.maven:lib:tests</exclude>
+                                    <exclude>log4j:log4j:jar:</exclude>
+                                    <exclude>com.google.gson:*</exclude>
+                                    <exclude>com.google.common:*</exclude>
+                                    <exclude>com.google.thirdparty:*</exclude>
+                                    <exclude>com.google.guava:*</exclude>
+                                    <exclude>org.javassist:*</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.intellij.</pattern>
+                                    <shadedPattern>dev.lone.fastnbt_benchmark.libs.org.intellij.</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.jetbrains.</pattern>
+                                    <shadedPattern>dev.lone.fastnbt_benchmark.libs.org.jetbrains.</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
-
     <dependencies>
+        <dependency>
+            <groupId>dev.lone</groupId>
+            <artifactId>LoneLibs</artifactId>
+            <version>1.0.33</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>24.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>dev.lone.LoneLibs</groupId>
-            <artifactId>LoneLibs</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${jars_libs_folder}/LoneLibs.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>dev.lone.FastNbt</groupId>
-            <artifactId>FastNbt</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${jars_libs_folder}/FastNbt.jar</systemPath>
         </dependency>
     </dependencies>
 </project>
