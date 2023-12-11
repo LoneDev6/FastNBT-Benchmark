@@ -1,8 +1,8 @@
 package dev.lone.fastnbt_benchmark.tests;
 
 import dev.lone.LoneLibs.nbt.nbtapi.*;
-import dev.lone.fastnbt.nms.nbt.*;
-import dev.lone.fastnbt.nms.nbt.NBTType;
+import lonelibs.dev.lone.fastnbt.nms.nbt.*;
+import lonelibs.dev.lone.fastnbt.nms.nbt.NBTType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

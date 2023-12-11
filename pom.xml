@@ -6,7 +6,7 @@
 
     <artifactId>FastNbt_benchmark</artifactId>
     <groupId>dev.lone</groupId>
-    <version>VERSION</version>
+    <version>1.1.2</version>
 
     <name>FastNbt</name>
     <packaging>pom</packaging>
@@ -17,8 +17,6 @@
         <maven.compiler.target>9</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <paper-nms-maven-plugin-version>1.4.2</paper-nms-maven-plugin-version>
-        <jars_libs_folder>C:/Progetti/Minecraft/Spigot/_jars</jars_libs_folder>
-        <targets_prefix_folder>R:\maven-target</targets_prefix_folder>
     </properties>
 
     <modules>
@@ -67,31 +65,7 @@
     </repositories>
 
     <build>
-        <!-- Disable useless maven plugins -->
-        <!-- https://developer.jboss.org/people/ozizka/blog/2013/07/06/how-to-speed-up-maven-builds-disabling-unused-plugins -->
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>2.5</version>
-                <executions> <execution> <id>default-clean</id> <phase>none</phase> </execution> </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M4</version>
-                <executions> <execution> <id>default-test</id> <phase>none</phase> </execution> </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
-                <executions>
-                    <execution> <id>default-testResources</id> <phase>none</phase> </execution>
-                </executions>
-            </plugin>
-
-            <!-- Shading -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -132,19 +106,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>dev.lone</groupId>
-            <artifactId>LoneLibs</artifactId>
-            <version>1.0.33</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>24.1.0</version>
-        </dependency>
-    </dependencies>
 </project>

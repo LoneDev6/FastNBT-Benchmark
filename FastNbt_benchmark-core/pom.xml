@@ -5,7 +5,7 @@
     <parent>
         <artifactId>FastNbt_benchmark</artifactId>
         <groupId>dev.lone</groupId>
-        <version>VERSION</version>
+        <version>1.1.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -27,5 +27,18 @@
             <classifier>remapped-mojang</classifier>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>dev.lone</groupId>
+            <artifactId>LoneLibs</artifactId>
+            <version>1.0.33</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>24.1.0</version>
+        </dependency>
     </dependencies>
+
 </project>
